@@ -1,35 +1,43 @@
-{
-  {
-  "dependencies": {
-    "express": "^4.18.2",
-    "mysql2": "^2.3.3",
-    "sequelize": "^6.12.0",
-    "bcrypt": "^5.0.1",
-    "dotenv": "^16.0.3",
-    "jsonwebtoken": "^8.5.1"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.22"
-  }
-}
+const mysql = require('mysql2');
 
-  "version": "1.0.0",
-  "description": "A basic Express.js app with user authentication, dashboard, and security enhancements",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
-  },
-  "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "helmet": "^5.1.0",
-    "morgan": "^1.10.0",
-    "dotenv": "^16.0.3"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.22"
-  },
-  "author": "Your Name",
-  "license": "MIT"
-}
+// Create a connection to the MySQL database
+const connection = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',  // Change to your MySQL username
+  password: 'password',  // Change to your MySQL password
+  database: 'myapp_db'  // Change to your database name
+});
+
+// Connect to the database
+connection.connect((err) => {
+  if (err) {
+    console.error('Error connecting to the database: ' + err.stack);
+    return;
+  }
+  console.log('Connected to the database');
+});
+
+// SQL query to create the `users` table
+const createTableSQL = `
+  CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(50) DEFAULT 'user' CHECK (role IN ('user', 'admin')),
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  );
+`;
+
+// Execute the query to create the table
+connection.query(createTableSQL, (err, results) => {
+  if (err) {
+    console.error('Error creating table: ' + err.stack);
+    return;
+  }
+  console.log('Table created successfully');
+});
+
+// Close the connection after the operation
+connection.end();
