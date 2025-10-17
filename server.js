@@ -128,6 +128,24 @@ app.get('/api/dashboard/admin', (req, res) => {
     }
     res.json({ success: true, message: 'Welcome to your admin dashboard!' });
 });
+// Register routes
+app.post('/api/register/student', (req, res) => { ... });
+app.post('/api/register/parent', (req, res) => { ... });
+app.post('/api/register/tutor', (req, res) => { ... });
+app.post('/api/register/admin', (req, res) => { ... });
+
+// Login routes
+app.post('/api/login/student', (req, res) => { ... });
+app.post('/api/login/parent', (req, res) => { ... });
+app.post('/api/login/tutor', (req, res) => { ... });
+app.post('/api/login/admin', (req, res) => { ... });
+
+// Dashboard routes
+app.get('/api/dashboard/student', (req, res) => { ... });
+app.get('/api/dashboard/parent', (req, res) => { ... });
+app.get('/api/dashboard/tutor', (req, res) => { ... });
+app.get('/api/dashboard/admin', (req, res) => { ... });
+
 
 // Start server on port 5000
 const PORT = process.env.PORT || 5000;
