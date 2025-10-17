@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: my-backend
+    env: node
+    buildCommand: npm install  # Command to install dependencies
+    startCommand: node server.js  # Command to start your backend
+    envVars:
+      - key: NODE_ENV
+        value: production
