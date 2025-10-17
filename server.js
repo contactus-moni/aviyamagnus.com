@@ -8,6 +8,10 @@ app.use(cors({
     origin: 'https://www.contactus.aviyamagnus.com',  // Replace with your frontend URL
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type']
+    app.post('/api/register/student', (req, res) => {
+    // Registration logic here
+});
+
 }));
 
 // Parse incoming JSON requests
@@ -21,6 +25,7 @@ app.post('/api/register/student', (req, res) => {
     const { email, password } = req.body;
     if (users.student[email]) {
         return res.status(400).json({ success: false, message: 'Student already registered' });
+        
     }
     users.student[email] = { email, password };
     res.status(201).json({ success: true, message: 'Student registered successfully' });
