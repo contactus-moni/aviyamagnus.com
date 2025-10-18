@@ -1,10 +1,19 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan');
-const authController = require('./controllers/authController');
-const dashboardController = require('./controllers/dashboardController');
+const express = require("express");
+const app = express();
+
+try {
+  const helmet = require("helmet");
+  app.use(helmet());
+} catch (err) {
+  console.warn("⚠️ Helmet not found – continuing without it");
+}
+
+app.use(express.json());
+app.get("/", (req, res) => res.send("Server running ✅"));
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+
 
 const app = express();
 
