@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Chat - Aviya Magnus</title><link rel="stylesheet" href="/css/style.css"></head><body>
+<!-- HEADER START -->
+<header class="header-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-3 col-md-3">
+        <div class="site-logo"><a href="/index.html"><img src="/img/logo.png" alt="Logo" style="max-width:100%;height:auto;"></a></div>
+        <div class="nav-switch"><i class="fa fa-bars"></i></div>
+      </div>
+      <div class="col-lg-9 col-md-9">
+        <nav class="main-menu">
+          <ul>
+            <li><a href="/index.html">Home</a></li>
+            <li><a href="/about/about.html">About</a></li>
+            <li><a href="/courses/courses.html">Courses</a></li>
+            <li><a href="/testimonial/testimonial.html">Testimonials</a></li>
+            <li><a href="/faq/faq.html">FAQ</a></li>
+            <li><a href="/contact.html">Contact</a></li>
+            <li class="dropdown">
+              <a href="#" class="site-btn header-btn" id="loginToggle">Login ▾</a>
+              <ul class="dropdown-menu" id="loginMenu">
+                <li><a href="/login-student.html">Student</a></li>
+                <li><a href="/login-parent.html">Parent</a></li>
+                <li><a href="/login-teacher.html">Teacher</a></li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</header>
+<!-- HEADER END -->
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  const loginToggle = document.getElementById('loginToggle');
+  const loginMenu = document.getElementById('loginMenu');
+  if(loginToggle && loginMenu){
+    loginToggle.addEventListener('click', function(e){ e.preventDefault(); loginMenu.classList.toggle('show'); });
+    document.addEventListener('click', function (event) {
+      if (!loginToggle.contains(event.target) && !loginMenu.contains(event.target)) {
+        loginMenu.classList.remove('show');
+      }
+    });
+  }
+});
+</script>
+<style>
+.header-section{background:#003366;padding:18px 0;color:#fff}
+.main-menu ul{list-style:none;display:flex;gap:18px;margin:0;padding:0;align-items:center;justify-content:flex-end}
+.main-menu a{color:#fff;text-decoration:none;padding:8px 12px;border-radius:6px}
+.site-btn{background:#ff9900;color:#fff;padding:8px 14px;border-radius:6px;text-decoration:none;display:inline-block}
+.dropdown-menu{display:none;position:absolute;background:#fff;color:#333;border-radius:6px;padding:8px 0;min-width:160px;box-shadow:0 6px 20px rgba(0,0,0,0.12);}
+.dropdown-menu.show{display:block}
+.dropdown-menu li{list-style:none}
+.dropdown-menu li a{display:block;padding:8px 16px;color:#333}
+@media (max-width:991px){ .main-menu ul{flex-direction:column;display:none} .nav-switch{display:block} .nav-switch.active + .main-menu ul{display:flex} }
+</style>
+<section class="page-section">
+  <div class="container">
+    <h2>Chat Room (Demo)</h2>
+    <div class="chat-window">
+      <div id="messages"></div>
+      <input id="msgInput" placeholder="Type a message..."><button class="site-btn" onclick="sendDemo()">Send</button>
+    </div>
+    <p style="margin-top:12px;color:#666">This is a client-side demo. For realtime chat, connect Firebase (see /js/firebase-init.js).</p>
+  </div>
+</section>
+<!-- FOOTER START -->
+<footer class="footer-section spad pb-0" style="background:#f8f9fb;padding:40px 0;margin-top:40px;">
+  <div class="container">
+    <div style="display:flex;gap:30px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:200px">
+        <h4>Contact Info</h4>
+        <p>1/101, Kavari Street, Latteri<br>Vellore 632202<br>+918248802124</p>
+        <p><a href="mailto:contactus@aviyamagnus.com">contactus@aviyamagnus.com</a></p>
+      </div>
+      <div style="flex:1;min-width:200px">
+        <h4>Quick Links</h4>
+        <ul style="list-style:none;padding:0;">
+          <li><a href="/about/about.html">About</a></li>
+          <li><a href="/courses/courses.html">Courses</a></li>
+          <li><a href="/contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div style="flex:1;min-width:200px">
+        <h4>Newsletter</h4>
+        <form id="footerNewsletter"><input placeholder="E-mail" style="padding:8px;margin-right:6px"><button class="site-btn" type="button">Subscribe</button></form>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:24px;color:#777">
+      © <span id="yr"></span> Aviya Magnus. All rights reserved.
+    </div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+<style>.footer-section h4{margin:0 0 8px 0}</style>
+<!-- FOOTER END -->
+
+<script>
+function sendDemo(){
+  const m = document.getElementById('msgInput').value; if(!m) return;
+  const div = document.createElement('div'); div.textContent = 'You: ' + m;
+  document.getElementById('messages').appendChild(div);
+  document.getElementById('msgInput').value='';
+  document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+}
+</script>
+<script src="/js/main.js"></script>
+</body>
+</html>
