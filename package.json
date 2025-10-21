@@ -1,11 +1,11 @@
-"scripts": { "start": "node server.js" }
-
 {
   "name": "aviyamagnus-backend",
   "version": "1.0.0",
   "description": "Backend server for aviyamagnus.com built with Node.js and Express",
   "main": "server.js",
-  
+  "scripts": {
+    "start": "node server.js"
+  },
   "engines": {
     "node": ">=20.0.0"
   },
