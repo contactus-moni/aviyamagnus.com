@@ -10,7 +10,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Port setup
+// Port setup (Render sets process.env.PORT automatically)
 const PORT = process.env.PORT || 3000;
 
 // Database connection
@@ -18,7 +18,7 @@ const db = mysql.createConnection({
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'aviyamagnus',
+  database: process.env.DB_NAME || 'aviyamagnus'
 });
 
 db.connect((err) => {
@@ -30,12 +30,12 @@ db.connect((err) => {
   }
 });
 
-// Simple test route
+// Test route
 app.get('/', (req, res) => {
   res.send('Server is running!');
 });
 
-// Example API route to fetch courses (adjust table names as per your DB)
+// Example route: fetch courses
 app.get('/courses', (req, res) => {
   const sql = 'SELECT * FROM courses';
   db.query(sql, (err, results) => {
