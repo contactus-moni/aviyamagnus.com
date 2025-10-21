@@ -1,21 +1,15 @@
-const express = require("express");
+const express = require('express');
 const app = express();
 
-try {
-  const helmet = require("helmet");
-  app.use(helmet());
-} catch (err) {
-  console.warn("⚠️ Helmet not found – continuing without it");
-}
+const PORT = process.env.PORT || 3000; // Use Render’s port
 
-app.use(express.json());
-app.get("/", (req, res) => res.send("Server running ✅"));
+app.get('/', (req, res) => {
+  res.send('Server is running!');
+});
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
-
-
-const app = express();
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
 // Middleware setup
 app.use(cors());  // CORS setup
