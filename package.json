@@ -1,5 +1,5 @@
-("scripts": { "start": "node server.js" }
-}
+"scripts": { "start": "node server.js" }
+
 {
   "name": "aviyamagnus-backend",
   "version": "1.0.0",
