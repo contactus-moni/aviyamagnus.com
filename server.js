@@ -1,56 +1,44 @@
-// server.js
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const { Pool } = require('pg'); // PostgreSQL client
+import express from "express";
+import cors from "cors";
+import pkg from "pg";
+
+const { Pool } = pkg;
+
+// === PostgreSQL connection ===
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL, // Render automatically sets this
+  ssl: {
+    rejectUnauthorized: false,
+  },
+});
 
 const app = express();
-
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Port setup (Render sets process.env.PORT automatically)
-const PORT = process.env.PORT || 3000;
-
-// PostgreSQL database connection
-const pool = new Pool({
-  host: process.env.DB_dpg-d3rm7q95pdvs73fql7s0-a,
-  port: process.env.DB_PORT || 5432,
-  user: process.env.DB_aviyamagnus,
-  password: process.env.DB_k6zXVRlotvtVRJzgRXKM0Z01CkQPz6dl,
-  database: process.env.DB_aviyamagnus,
-  ssl: { rejectUnauthorized: false } // Required for Render Postgres
+// --- Test route ---
+app.get("/", (req, res) => {
+  res.json({ message: "Backend is running successfully 🚀" });
 });
 
-// Test DB connection
-pool.connect((err, client, release) => {
-  if (err) {
-    console.error('❌ Database connection failed:', err.message);
-    process.exit(1); // Exit if DB fails
-  } else {
-    console.log('✅ PostgreSQL connected successfully');
-    release();
-  }
-});
-
-// Test route
-app.get('/', (req, res) => {
-  res.send('Server is running!');
-});
-
-// Example route: fetch courses
-app.get('/courses', async (req, res) => {
+// --- Register route ---
+app.post("/register", async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM courses');
-    res.json(result.rows);
+    const { name, email } = req.body;
+    if (!name || !email)
+      return res.status(400).json({ error: "Missing fields" });
+
+    await pool.query(
+      "INSERT INTO users (name, email) VALUES ($1, $2)",
+      [name, email]
+    );
+
+    res.json({ status: "success", message: "User added!" });
   } catch (err) {
-    console.error('Error fetching courses:', err.message);
-    res.status(500).json({ error: 'Database query failed' });
+    console.error("Database error:", err);
+    res.status(500).json({ error: "Server error", details: err.message });
   }
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-});
+const port = process.env.PORT || 10000;
+app.listen(port, () => console.log(`✅ Server running on port ${port}`));
