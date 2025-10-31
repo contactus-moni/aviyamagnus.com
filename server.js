@@ -1,36 +1,29 @@
-import express from "express";
-import cors from "cors";
-
+const express = require('express');
+const path = require('path');
 const app = express();
+
+// Middleware
 app.use(express.json());
-app.use(
-  cors({
-    origin: "https://contactus.aviyamagnus.com", // your real frontend
-  })
-);
+app.use(express.urlencoded({ extended: true }));
 
-// ✅ simple check route
-app.get("/", (req, res) => {
-  res.send("Backend is running fine ✅");
+// Serve static files (CSS, JS, images)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Route to serve signup page
+app.get('/register', (req, res) => {
+  res.sendFile(path.join(__dirname, 'signup.html'));
 });
 
-// ✅ show message for GET /register
-app.get("/register", (req, res) => {
-  res.send("Use POST /register instead");
-});
-
-// ✅ actual POST API
-app.post("/register", (req, res) => {
-  const { name, email, message } = req.body;
-  console.log("Received:", name, email, message);
-  res.json({ status: "success", message: "Registered OK" });
-});
-
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log("Server running on port", port));
-
+// API endpoint for form submission (optional)
 app.post('/register', (req, res) => {
-  // handle registration
-  res.json({ message: 'User registered successfully!' });
+  const { username, password, email } = req.body;
+
+  // Here you can save to DB or perform any logic
+  console.log('New registration:', username, email);
+
+  res.json({ status: 'success', message: 'Registration successful!' });
 });
 
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
