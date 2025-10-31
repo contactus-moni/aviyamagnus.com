@@ -1,9 +1,9 @@
 <?php
 // Database connection settings for phpMyAdmin (using shared hosting like InfinityFree)
-$servername = "sql100.epizy.com";  // Replace with the actual host from your phpMyAdmin panel
-$username = "aviyamagnus_suer";    // Replace with your actual MySQL username
-$password = "Monicaanandan";    // Replace with your actual MySQL password
-$dbname = "aviyamagnus_db";        // Replace with your actual database name
+$servername = "dpg-d3rm7q95pdvs73fql7s0-a"; 
+$username = "aviyamagnus1"; 
+$password = "k6zXVRlotvtVRJzgRXKM0Z01CkQPz6dl"; 
+$dbname = "aviyamagnus";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
