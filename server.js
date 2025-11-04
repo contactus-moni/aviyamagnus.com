@@ -11,10 +11,10 @@ app.use(express.json()); // replaces bodyParser.json()
 
 // ✅ PostgreSQL connection
 const pool = new Pool({
-  user: "aviyamagnus", // your DB user
-  host: "dpg-d3rm7q95pdvs73fqI7s0-a.singapore-postgres.render.com",
-  database: "aviyamagnus", // your DB name
-  password: "k6zXVRlotvtVRJzgRXKM0Z01CkQPz6dl", // replace with actual password
+  user: "postgres", // your DB user
+  host: "localhost",
+  database: "postgres", // your DB name
+  password: "Monicaanandan", // replace with actual password
   port: 5432,
   ssl: { rejectUnauthorized: false }
 });
