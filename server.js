@@ -1,59 +1,25 @@
 import express from "express";
-import cors from "cors";
+import bodyParser from "body-parser";
 import pkg from "pg";
-
 const { Pool } = pkg;
+
 const app = express();
+const PORT = 5000;
 
 // ✅ Middleware
-app.use(cors());
-app.use(express.json()); // replaces bodyParser.json()
+app.use(bodyParser.json());
 
-// ✅ PostgreSQL connection
+// ✅ PostgreSQL Connection
 const pool = new Pool({
-  user: "postgres", // your DB user
-  host: "localhost",
-  database: "postgres", // your DB name
-  password: "Monicaanandan", // replace with actual password
+  user: "postgres",           // your DB user
+  host: "localhost",          // your DB host
+  database: "postgres",       // your DB name
+  password: "Monicaanandan",  // your DB password
   port: 5432,
-  ssl: { rejectUnauthorized: false }
+  ssl: false,                 // keep it false for local pgAdmin
 });
 
-pool.connect()
-  .then(() => console.log("✅ Connected to PostgreSQL database successfully"))
-  .catch(err => console.error("❌ Database connection failed:", err));
-
-// ✅ Register endpoint
-app.post("/register", async (req, res) => {
-  try {
-    const { name, email, password, phone, role } = req.body;
-
-    if (!name || !email || !password) {
-      return res.status(400).json({ status: "error", message: "Missing required fields" });
-    }
-
-    // Insert into table
-    const result = await pool.query(
-      `INSERT INTO users (username, email, password, created_at)
-       VALUES ($1, $2, $3, CURRENT_TIMESTAMP)
-       RETURNING id`,
-      [name, email, password]
-    );
-
-    console.log("✅ User registered with ID:", result.rows[0].id);
-    res.json({ status: "success", message: "User registered successfully" });
-
-  } catch (err) {
-    console.error("❌ Error inserting user:", err);
-    res.status(500).json({ status: "error", message: "Database error" });
-  }
-});
-
-// ✅ Root test route
-app.get("/", (req, res) => {
-  res.send("Backend running successfully ✅");
-});
-// ✅ Test database connection route
+// ✅ Route to test DB connection
 app.get("/testdb", async (req, res) => {
   try {
     const result = await pool.query("SELECT NOW()");
@@ -72,10 +38,5 @@ app.get("/testdb", async (req, res) => {
   }
 });
 
-
-
-// ✅ Start server
-const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-});
+// ✅ Root route
+app.get("/", (req, res) =
