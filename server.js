@@ -1,58 +1,81 @@
-import express from "express";
-import cors from "cors";
-import bodyParser from "body-parser";
-import mysql from "mysql2";
+// ===============================
+// server.js - Final Working Version
+// ===============================
 
+// Import required packages
+const express = require("express");
+const cors = require("cors");
+const mysql = require("mysql");
+require("dotenv").config();
+
+// Initialize app
 const app = express();
+const PORT = process.env.PORT || 5000;
 
-// ✅ Allow frontend
-app.use(
-  cors({
-    origin: "https://contactus.aviyamagnus.com",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  })
-);
-
-app.use(bodyParser.json());
+// Middleware
+app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// ✅ Connect to MySQL database
+// -----------------------------------------
+// ✅ DATABASE CONNECTION (AquaHost MySQL)
+// -----------------------------------------
 const db = mysql.createConnection({
-  host: "localhost",        // e.g. sql123.epizy.com
-  user: "aviyama1_aviyams",    // e.g. epiz_12345678
-  password: "Monicaanandan",
-  database: "aviyama1_sql",    // e.g. epiz_12345678_mydb
+  host: process.env.DB_HOST || "sqlXXX.aquahost.net", // Replace with your actual host name from AquaHost
+  user: process.env.DB_USER || "aviyama1_aviyams",
+  password: process.env.DB_PASS || "YOUR_MYSQL_PASSWORD_HERE",
+  database: process.env.DB_NAME || "aviyama1_sql",
 });
 
-// ✅ Check DB connection
+// Connect to MySQL
 db.connect((err) => {
   if (err) {
-    console.error("Database connection failed:", err);
+    console.error("❌ Database connection failed:", err.message);
+    process.exit(1); // Stop app if DB connection fails
   } else {
-    console.log("✅ Connected to MySQL database!");
+    console.log("✅ Connected to AquaHost MySQL database successfully!");
   }
 });
 
-// Example register route
-app.post("/register", (req, res) => {
-  const { name, email, password } = req.body;
-  const query = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
-  db.query(query, [name, email, password], (err, result) => {
+// -----------------------------------------
+// ✅ SAMPLE API ROUTES
+// -----------------------------------------
+
+// Root route
+app.get("/", (req, res) => {
+  res.send("Server is running successfully 🚀");
+});
+
+// Example route - Fetch all users
+app.get("/users", (req, res) => {
+  db.query("SELECT * FROM users", (err, results) => {
     if (err) {
-      console.error(err);
-      res.status(500).json({ status: "error", message: "Database error" });
+      console.error("Error fetching users:", err);
+      res.status(500).json({ error: "Database query error" });
     } else {
-      res.json({ status: "success", message: "Registration successful!" });
+      res.json(results);
     }
   });
 });
 
-// Default route
-app.get("/", (req, res) => {
-  res.send("Backend and MySQL connected successfully!");
+// Example route - Insert user
+app.post("/add-user", (req, res) => {
+  const { name, email } = req.body;
+  if (!name || !email) return res.status(400).json({ error: "Missing fields" });
+
+  const sql = "INSERT INTO users (name, email) VALUES (?, ?)";
+  db.query(sql, [name, email], (err, result) => {
+    if (err) {
+      console.error("Error inserting user:", err);
+      res.status(500).json({ error: "Insert failed" });
+    } else {
+      res.json({ message: "User added successfully!", id: result.insertId });
+    }
+  });
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// -----------------------------------------
+// ✅ START SERVER
+// -----------------------------------------
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
