@@ -57,3 +57,21 @@ app.post("/register", async (req, res) => {
 // --- Start Server ---
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+// --- Create Users Table Route ---
+app.get("/createtable", async (req, res) => {
+  try {
+    const query = `
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(100),
+        email VARCHAR(150) UNIQUE NOT NULL,
+        password VARCHAR(100) NOT NULL
+      );
+    `;
+    await pool.query(query);
+    res.send("✅ Table 'users' created successfully!");
+  } catch (err) {
+    console.error("❌ Error creating table:", err.message);
+    res.status(500).send("❌ Error creating table: " + err.message);
+  }
+});
