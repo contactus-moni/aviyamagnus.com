@@ -1,3 +1,6 @@
+app.get("/", (req, res) => {
+  res.send("Backend is running and connected successfully 🚀");
+});
 import express from "express";
 import cors from "cors";
 import pkg from "pg";
