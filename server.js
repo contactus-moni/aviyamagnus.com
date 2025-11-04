@@ -11,12 +11,12 @@ app.use(cors());
 app.use(express.json());
 
 const pool = new Pool({
-  user: "aviyamagnus",
-  host: "dpg-d3rm7q95pdvs73fqI7s0-a.singapore-postgres.render.com",
-  database: "aviyamagnus",
-  password: "k6zXVR1otvtVRJzgRXKM0Z01CkQPz6d1",
-  port: 5432,
-  ssl: { require: true, rejectUnauthorized: false },
+  host: process.env.PGHOST,
+  port: process.env.PGPORT,
+  user: process.env.PGUSER,
+  password: process.env.PGPASSWORD,
+  database: process.env.PGDATABASE,
+  ssl: { rejectUnauthorized: false },
 });
 
 app.get("/testdb", async (req, res) => {
