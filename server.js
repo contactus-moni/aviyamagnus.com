@@ -9,9 +9,12 @@ app.use(express.json());
 
 // ✅ Render PostgreSQL connection (replace below with your exact values)
 const pool = new Pool({
-  connectionString: "postgres://<username>:<password>@dpg-xxxxx.singapore-postgres.render.com:5432/<dbname>",
-  ssl: { rejectUnauthorized: false }
-});
+Host: dpg-d3rm7q95pdvs73fqI7s0-a
+Port: 5432
+Database: aviyamagnus
+Username: aviyamagnus
+Password: k6zXVR1otvtVRJzgRXKM0Z01CkQPz6d1
+
 
 // ✅ Test route to verify DB connection
 app.get("/testdb", async (req, res) => {
