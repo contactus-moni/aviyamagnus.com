@@ -19,7 +19,6 @@ const pool = new Pool({
   },
 });
 
-
 // --- Test Route ---
 app.get("/testdb", async (req, res) => {
   try {
