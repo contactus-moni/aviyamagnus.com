@@ -57,12 +57,21 @@ app.get("/", (req, res) => {
 app.get("/testdb", async (req, res) => {
   try {
     const result = await pool.query("SELECT NOW()");
-    res.json({ status: "success", message: "Database connected!", time: result.rows[0] });
+    res.json({
+      status: "success",
+      message: "Database connected successfully!",
+      time: result.rows[0],
+    });
   } catch (error) {
     console.error("❌ Database test failed:", error);
-    res.status(500).json({ status: "error", message: "Database connection failed" });
+    res.status(500).json({
+      status: "error",
+      message: "Database connection failed",
+      error: error.message,
+    });
   }
 });
+
 
 
 // ✅ Start server
