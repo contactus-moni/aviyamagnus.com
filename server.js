@@ -1,37 +1,38 @@
 import express from "express";
-import pkg from "pg";
 import cors from "cors";
-
+import pkg from "pg";
 const { Pool } = pkg;
+
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ✅ Render PostgreSQL connection (replace below with your exact values)
+// --- PostgreSQL Connection ---
 const pool = new Pool({
-Host: dpg-d3rm7q95pdvs73fqI7s0-a
-Port: 5432
-Database: aviyamagnus
-Username: aviyamagnus
-Password: k6zXVR1otvtVRJzgRXKM0Z01CkQPz6d1
+  user: "aviyamagnus",
+  host: "dpg-d3rm7q95pdvs73fqI7s0-a.singapore-postgres.render.com",
+  database: "aviyamagnus",
+  password: "k6zXVR1otvtVRJzgRXKM0Z01CkQPz6d1",
+  port: 5432, // ✅ keep this line inside the object
+  ssl: {
+    require: true,
+    rejectUnauthorized: false,
+  },
+});
 
-
-// ✅ Test route to verify DB connection
+// --- Test Route ---
 app.get("/testdb", async (req, res) => {
   try {
     const result = await pool.query("SELECT NOW()");
     res.json({ success: true, time: result.rows[0].now });
   } catch (err) {
-    console.error("DB test error:", err);
-    res.status(500).json({ success: false, error: err.message });
+    console.error("Database Error:", err.message);
+    res.json({ success: false, error: err.message });
   }
 });
 
-// ✅ Basic route for root (optional)
-app.get("/", (req, res) => {
-  res.send("Backend is live and working ✅");
+// --- Start Server ---
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
 });
-
-// ✅ Start the server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
