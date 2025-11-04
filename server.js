@@ -21,10 +21,10 @@ app.use(bodyParser.json());
 
 // ✅ Use environment variables on Render; fallback to local DB
 const pool = new Pool({
-  user: process.env.DB_USER || "postgres",
-  host: process.env.DB_HOST || "localhost",
-  database: process.env.DB_NAME || "postgres",
-  password: process.env.DB_PASSWORD || "Monicaanandan",
+  user: process.env.DB_USER || "aviyamagnus",
+  host: process.env.DB_HOST || "dpg-d3rm7q95pdvs73fql7s0-a",
+  database: process.env.DB_NAME || "aviyamagnus",
+  password: process.env.DB_PASSWORD || "k6zXVRlotvtVRJzgRXKM0Z01CkQPz6dl",
   port: process.env.DB_PORT || 5432,
   ssl:
     process.env.DB_SSL === "true"
