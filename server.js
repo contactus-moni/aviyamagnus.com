@@ -1,31 +1,39 @@
-import express from 'express';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+// server.js
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const express = require("express");
+const cors = require("cors");
+const bodyParser = require("body-parser");
 
 const app = express();
 
+// ✅ Allow your frontend domain
+app.use(
+  cors({
+    origin: "https://contactus.aviyamagnus.com", // frontend domain
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
+
 // Middleware
+app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Route to serve signup page
-app.get('/register', (req, res) => {
-  res.sendFile(path.join(__dirname, 'signup.html'));
+// Example register route
+app.post("/register", (req, res) => {
+  console.log("Register request received:", req.body);
+  // your signup logic here
+  res.json({ status: "success", message: "Registration successful!" });
 });
 
-// API endpoint
-app.post('/register', (req, res) => {
-  const { username, password, email } = req.body;
-  console.log('New registration:', username, email);
-  res.json({ status: 'success', message: 'Registration successful!' });
+// Default route
+app.get("/", (req, res) => {
+  res.send("Backend is running successfully!");
 });
 
+// ✅ Render requires dynamic port
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
