@@ -10,10 +10,10 @@ app.use(express.json());
 // --- PostgreSQL Connection ---
 const pool = new Pool({
   user: "aviyamagnus",
-  host: "dpg-d3rm7q95pdvs73fqI7s0-a",
+  host: "dpg-d3rm7q95pdvs73fqI7s0-a.singapore-postgres.render.com",  // ✅ full hostname required
   database: "aviyamagnus",
   password: "k6zXVR1otvtVRJzgRXKM0Z01CkQPz6d1",
-  port: 5432, // ✅ keep this line inside the object
+  port: 5432,
   ssl: {
     require: true,
     rejectUnauthorized: false,
