@@ -1,56 +1,61 @@
 import express from "express";
 import cors from "cors";
 import pkg from "pg";
+
 const { Pool } = pkg;
-
-
 const app = express();
-app.use(cors());
-app.use(bodyParser.json());
 
-// 🔐 Database connection
+// ✅ Middleware
+app.use(cors());
+app.use(express.json()); // replaces bodyParser.json()
+
+// ✅ PostgreSQL connection
 const pool = new Pool({
-  host: "dpg-d3rm7q95pdvs73fql7s0-a.singapore-postgres.render.com",
+  user: "aviyamagnus", // your DB user
+  host: "dpg-d3rm7q95pdvs73fqI7s0-a.singapore-postgres.render.com",
+  database: "aviyamagnus", // your DB name
+  password: "k6zXVRlotvtVRJzgRXKM0Z01CkQPz6dl", // replace with actual password
   port: 5432,
-  database: "aviyamagnus",
-  user: "aviyamagnus",
-  password: "k6zXVRlotvtVRJzgRXKM0Z01CkQPz6dl",
   ssl: { rejectUnauthorized: false }
 });
+
+pool.connect()
+  .then(() => console.log("✅ Connected to PostgreSQL database successfully"))
+  .catch(err => console.error("❌ Database connection failed:", err));
 
 // ✅ Register endpoint
 app.post("/register", async (req, res) => {
   try {
-    const {
-      user_type,
-      first_name,
-      last_name,
-      email,
-      password,
-      confirm_password,
-      country_code,
-      phone_number,
-      captcha
-    } = req.body;
+    const { name, email, password, phone, role } = req.body;
 
+    if (!name || !email || !password) {
+      return res.status(400).json({ status: "error", message: "Missing required fields" });
+    }
+
+    // Insert into table
     const result = await pool.query(
-      `INSERT INTO users 
-      (user_type, first_name, last_name, email, password, confirm_password, country_code, phone_number, captcha) 
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
-      RETURNING id`,
-      [user_type, first_name, last_name, email, password, confirm_password, country_code, phone_number, captcha]
+      `INSERT INTO users (username, email, password, created_at)
+       VALUES ($1, $2, $3, CURRENT_TIMESTAMP)
+       RETURNING id`,
+      [name, email, password]
     );
 
-    res.json({
-      status: "success",
-      message: "User registered successfully!",
-      user_id: result.rows[0].id
-    });
+    console.log("✅ User registered with ID:", result.rows[0].id);
+    res.json({ status: "success", message: "User registered successfully" });
 
-  } catch (error) {
-    console.error("❌ Error inserting data:", error);
-    res.status(500).json({ status: "error", message: "Database insert failed." });
+  } catch (err) {
+    console.error("❌ Error inserting user:", err);
+    res.status(500).json({ status: "error", message: "Database error" });
   }
 });
 
-app.listen(5000, () => console.log("✅ Server running on port 5000"));
+// ✅ Root test route
+app.get("/", (req, res) => {
+  res.send("Backend running successfully ✅");
+});
+
+// ✅ Start server
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
