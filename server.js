@@ -1,15 +1,12 @@
 import express from "express";
-import bodyParser from "body-parser";
-import pkg from "pg";
 import cors from "cors";
-
+import pkg from "pg";
 const { Pool } = pkg;
 
 const app = express();
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
 
-// ---- PostgreSQL connection ----
 const pool = new Pool({
   user: "aviyamagnus",
   host: "dpg-d3rm7q95pdvs73fqI7s0-a.singapore-postgres.render.com",
@@ -19,19 +16,15 @@ const pool = new Pool({
   ssl: { require: true, rejectUnauthorized: false },
 });
 
-// ---- Test route ----
-app.get("/", async (req, res) => {
+app.get("/testdb", async (req, res) => {
   try {
     const result = await pool.query("SELECT NOW()");
-    res.send(`✅ Backend running! PostgreSQL time: ${result.rows[0].now}`);
+    res.json({ success: true, time: result.rows[0].now });
   } catch (err) {
-    console.error("Database connection failed:", err);
-    res.status(500).send("❌ Database connection failed");
+    console.error("Database connection failed:", err.message);
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 
-// ---- Start server ----
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
