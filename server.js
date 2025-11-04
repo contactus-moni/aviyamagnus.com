@@ -7,10 +7,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// --- PostgreSQL Connection ---
 const pool = new Pool({
   user: "aviyamagnus",
-  host: "dpg-d3rm7q95pdvs73fqI7s0-a.singapore-postgres.render.com",  // ✅ full hostname required
+  host: "dpg-d3rm7q95pdvs73fqI7s0-a.singapore-postgres.render.com",
   database: "aviyamagnus",
   password: "k6zXVR1otvtVRJzgRXKM0Z01CkQPz6d1",
   port: 5432,
@@ -19,6 +18,7 @@ const pool = new Pool({
     rejectUnauthorized: false,
   },
 });
+
 
 // --- Test Route ---
 app.get("/testdb", async (req, res) => {
