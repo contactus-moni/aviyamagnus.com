@@ -53,6 +53,17 @@ app.post("/register", async (req, res) => {
 app.get("/", (req, res) => {
   res.send("Backend running successfully ✅");
 });
+// ✅ Test database connection route
+app.get("/testdb", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT NOW()");
+    res.json({ status: "success", message: "Database connected!", time: result.rows[0] });
+  } catch (error) {
+    console.error("❌ Database test failed:", error);
+    res.status(500).json({ status: "error", message: "Database connection failed" });
+  }
+});
+
 
 // ✅ Start server
 const PORT = process.env.PORT || 10000;
