@@ -10,18 +10,15 @@ app.use(express.json());
 
 // ✅ PostgreSQL connection
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || "postgresql://aviyamagnus:k6zXVRlotvtVRJzgRXKM0Z01CkQPz6dl@dpg-d3rm7q95pdvs73fqI7s0-a.singapore-postgres.render.com/aviyamagnus",
+  user: "aviyamagnus",
+  host: "dpg-d3rm7q95pdvs73fqI7s0-a.singapore-postgres.render.com",
+  database: "aviyamagnus",
+  password: "YOUR_PASSWORD_HERE",
+  port: 5432,
   ssl: {
-    require: true,
-    rejectUnauthorized: false
-  }
+    rejectUnauthorized: false, // 👈 required for Render SSL
+  },
 });
-
-// ✅ Check database connection
-pool.connect()
-  .then(() => console.log("✅ Database connected successfully"))
-  .catch(err => console.error("❌ Database connection error:", err.message));
-
 // ✅ Home route
 app.get("/", (req, res) => {
   res.send("✅ Server is running and database connected!");
