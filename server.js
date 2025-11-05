@@ -13,7 +13,7 @@ const pool = new Pool({
   user: "aviyamagnus",
   host: "dpg-d3rm7q95pdvs73fqI7s0-a.singapore-postgres.render.com",
   database: "aviyamagnus",
-  password: "YOUR_PASSWORD_HERE",
+  password: "k6zXVRlotvtVRJzgRXKM0Z01CkQPz6dl",
   port: 5432,
   ssl: {
     rejectUnauthorized: false, // 👈 required for Render SSL
