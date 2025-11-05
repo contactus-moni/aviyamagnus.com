@@ -1,35 +1,25 @@
 import express from "express";
 import cors from "cors";
-import bodyParser from "body-parser";
-import pkg from "pg";
-const { Pool } = pkg;
+import { Pool } from "pg";
 
 const app = express();
+app.use(cors()); // allow all origins, can restrict later
+app.use(express.json());
 
-// Allow requests from your frontend domain
-app.use(cors({
-  origin: "https://contactus.aviyamagnus.com", // Replace with your frontend domain
-  methods: ["GET", "POST"],
-  credentials: true
-}));
-
-app.use(bodyParser.json());
-
+// ✅ Replace with your Railway database details
 const pool = new Pool({
-  user: "postgres",
-  host: "postgres.railway.internal", // Render DB host
-  database: "railway",
-  password: "ZavKvXmHfseabcTxjNGjVLSRCxaXjySB",
-  port: 5432,
-  ssl: { rejectUnauthorized: false } // important for Railway
+  connectionString: "postgres://postgres:ZavKvXmHfseabcTxjNGjVLSRCxaXjySB@postgres.railway.internal:5432/railway",
+  ssl: { rejectUnauthorized: false } // bypass SSL certificate check
 });
 
-
-// POST /register route
+// --- Register endpoint ---
 app.post("/register", async (req, res) => {
   const { first_name, last_name, email, password, confirm_password, phone_number, captcha } = req.body;
-  
-  // Optional: validate password match here
+
+  // basic validation
+  if (!first_name || !last_name || !email || !password || !confirm_password || !phone_number || !captcha) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
   if (password !== confirm_password) {
     return res.status(400).json({ error: "Passwords do not match" });
   }
@@ -42,25 +32,23 @@ app.post("/register", async (req, res) => {
       RETURNING *`,
       [first_name, last_name, email, password, confirm_password, phone_number, captcha]
     );
+
     res.json({ message: "User registered successfully", user: result.rows[0] });
   } catch (err) {
-    console.error("Register Error:", err.message);
+    console.error("Database error:", err.message);
     res.status(500).json({ error: "Database error", details: err.message });
   }
 });
 
-// GET /users route to see all users
+// --- Optional: Get all users ---
 app.get("/users", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM aviyamagnus1");
     res.json(result.rows);
   } catch (err) {
-    console.error("Users Error:", err.message);
     res.status(500).json({ error: "Database error", details: err.message });
   }
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
