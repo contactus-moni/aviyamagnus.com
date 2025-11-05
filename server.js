@@ -8,12 +8,12 @@ app.use(cors());
 app.use(express.json());
 
 const pool = new Pool({
-  user: "aviyamagnus",
-  host: "dpg‑d3rm7q95pdvs73fql7s0‑a.oregion‑postgres.render.com", // Render DB host
-  database: "aviyamangus",
-  password: "k6zXVRlotvtVRJzgRXKM0Z01CkQPz6dl",
+  user: "postgres",
+  host: "postgres.railway.internal", // Render DB host
+  database: "railway",
+  password: "ZavKvXmHfseabcTxjNGjVLSRCxaXjySB",
   port: 5432,
-  ssl: { rejectUnauthorized: false } // <-- bypass SSL verification
+  ssl: { rejectUnauthorized: false } // important for Railway
 });
 
 app.get("/", (req, res) => {
