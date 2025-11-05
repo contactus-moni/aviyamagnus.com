@@ -1,48 +1,47 @@
-import express from "express";
-import pg from "pg";
-import cors from "cors";
+const express = require("express");
+const cors = require("cors");
+const { Pool } = require("pg");
 
-const { Pool } = pg;
 const app = express();
-
 app.use(cors());
 app.use(express.json());
 
-// ✅ PostgreSQL connection
+// PostgreSQL pool connecting to Render DB with SSL bypass
 const pool = new Pool({
-  user: "postgres",
-  host: "localhost",
-  database: "aviyamagnus",
+  user: "aviyamagnus",
+  host: "dpg‑d3rm7q95pdvs73fql7s0‑a.oregion‑postgres.render.com", // Render DB host
+  database: "aviyamangus",
   password: "k6zXVRlotvtVRJzgRXKM0Z01CkQPz6dl",
   port: 5432,
-  ssl: {
-    rejectUnauthorized: false, // 👈 required for Render SSL
-  },
-});
-// ✅ Home route
-app.get("/", (req, res) => {
-  res.send("✅ Server is running and database connected!");
+  ssl: { rejectUnauthorized: false } // <-- bypass SSL verification
 });
 
-// ✅ Register route (POST)
-app.post("/register", async (req, res) => {
+// Test GET endpoint to see all users
+app.get("/users", async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-    const result = await pool.query(
-      "INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *",
-      [name, email, password]
-    );
-    res.json({ status: "success", user: result.rows[0] });
-  } catch (error) {
-    console.error("Error during register:", error.message);
-    res.status(500).json({ status: "error", message: error.message });
+    const result = await pool.query("SELECT * FROM users");
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Database error" });
   }
 });
 
-// ✅ Fallback for undefined routes
-app.use((req, res) => {
-  res.status(404).send("Route not found");
+// Register POST endpoint
+app.post("/register", async (req, res) => {
+  const { name, email, password } = req.body;
+  try {
+    await pool.query(
+      "INSERT INTO users (name, email, password) VALUES ($1, $2, $3)",
+      [name, email, password]
+    );
+    res.json({ message: "User registered successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Database error" });
+  }
 });
 
-const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+// Start server on port from Render or default 5000
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
