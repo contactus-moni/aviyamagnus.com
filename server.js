@@ -14,10 +14,10 @@ const pool = new Pool({
 
 // --- Register endpoint ---
 app.post("/register", async (req, res) => {
-  const { first_name, last_name, email, password, confirm_password, phone_number, captcha } = req.body;
+  const { role, first_name, last_name, email, password, confirm_password, phone_number, captcha } = req.body;
 
   // basic validation
-  if (!first_name || !last_name || !email || !password || !confirm_password || !phone_number || !captcha) {
+  if (!role || first_name || !last_name || !email || !password || !confirm_password || !phone_number || !captcha) {
     return res.status(400).json({ error: "All fields are required" });
   }
   if (password !== confirm_password) {
@@ -27,10 +27,10 @@ app.post("/register", async (req, res) => {
   try {
     const result = await pool.query(
       `INSERT INTO aviyamagnus1 
-      (first_name, last_name, email, password, confirm_password, phone_number, captcha)
+      (role, first_name, last_name, email, password, confirm_password, phone_number, captcha)
       VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING *`,
-      [first_name, last_name, email, password, confirm_password, phone_number, captcha]
+      [role, first_name, last_name, email, password, confirm_password, phone_number, captcha]
     );
 
     res.json({ message: "User registered successfully", user: result.rows[0] });
