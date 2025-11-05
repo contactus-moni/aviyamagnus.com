@@ -16,15 +16,10 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false } // <-- bypass SSL verification
 });
 
-app.get("/users", async (req, res) => {
-  try {
-    const result = await pool.query("SELECT * FROM users");
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Database error" });
-  }
+app.get("/", (req, res) => {
+  res.send("Backend is running! Use /register or /users routes.");
 });
+
 
 app.post("/register", async (req, res) => {
   const { name, email, password } = req.body;
