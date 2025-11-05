@@ -10,7 +10,8 @@ app.use(bodyParser.json());
 
 // --- PostgreSQL Connection ---
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || "YOUR_POSTGRESQL_URL_HERE",
+  connectionString: process.env.DATABASE_URL || "postgres://aviyamagnus:k6zXVRlotvtVRJzgRXKM0Z01CkQPz6dl@dpg-d3rm7q95pdvs73fqI7s0-a.singapore-postgres.render.com/aviyamagnus
+",
   ssl: { rejectUnauthorized: false }
 });
 
