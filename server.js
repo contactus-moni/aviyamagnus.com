@@ -10,8 +10,8 @@ app.use(express.json());
 
 // ✅ PostgreSQL connection
 const pool = new Pool({
-  user: "aviyamagnus",
-  host: "dpg-d3rm7q95pdvs73fqI7s0-a.singapore-postgres.render.com",
+  user: "postgres",
+  host: "localhost",
   database: "aviyamagnus",
   password: "k6zXVRlotvtVRJzgRXKM0Z01CkQPz6dl",
   port: 5432,
