@@ -10,7 +10,7 @@ app.use(express.json());
 
 // ✅ PostgreSQL connection
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || "postgresql://aviyamagnus:<YOUR_PASSWORD>@dpg-d3rm7q95pdvs73fqI7s0-a.singapore-postgres.render.com/aviyamagnus",
+  connectionString: process.env.DATABASE_URL || "postgresql://aviyamagnus:k6zXVRlotvtVRJzgRXKM0Z01CkQPz6dl@dpg-d3rm7q95pdvs73fqI7s0-a.singapore-postgres.render.com/aviyamagnus",
   ssl: {
     require: true,
     rejectUnauthorized: false
