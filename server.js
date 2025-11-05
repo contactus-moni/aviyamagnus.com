@@ -39,9 +39,7 @@ app.post("/register", async (req, res) => {
 });
 
 // --- Default Route ---
-app.get("/", (req, res) => {
-  res.send("✅ Database connected successful");
-});
+pool.connect()
+  .then(() => console.log("✅ Database connected successful"))
+  .catch(err => console.error("❌ Database connection error:", err));
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
