@@ -8,7 +8,7 @@ app.use(express.json());
 
 // ✅ Replace with your Railway database details
 const pool = new Pool({
-  connectionString: "postgres://postgres:ZavKvXmHfseabcTxjNGjVLSRCxaXjySB@postgres.railway.internal:5432/railway",
+  connectionString: "postgresql://postgres:ZavKvXmHfseabcTxjNGjVLSRCxaXjySB@shuttle.proxy.rlwy.net:25707/railway",
   ssl: { rejectUnauthorized: false } // bypass SSL certificate check
 });
 
