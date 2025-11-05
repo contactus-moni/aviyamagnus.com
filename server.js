@@ -45,3 +45,4 @@ app.post("/register", async (req, res) => {
 // Start server on port from Render or default 5000
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
