@@ -1,12 +1,12 @@
-const express = require("express");
-const cors = require("cors");
-const { Pool } = require("pg");
+import express from "express";
+import cors from "cors";
+import pkg from "pg";
+const { Pool } = pkg;
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// PostgreSQL pool connecting to Render DB with SSL bypass
 const pool = new Pool({
   user: "aviyamagnus",
   host: "dpg‑d3rm7q95pdvs73fql7s0‑a.oregion‑postgres.render.com", // Render DB host
@@ -16,7 +16,6 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false } // <-- bypass SSL verification
 });
 
-// Test GET endpoint to see all users
 app.get("/users", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM users");
@@ -27,7 +26,6 @@ app.get("/users", async (req, res) => {
   }
 });
 
-// Register POST endpoint
 app.post("/register", async (req, res) => {
   const { name, email, password } = req.body;
   try {
@@ -42,7 +40,5 @@ app.post("/register", async (req, res) => {
   }
 });
 
-// Start server on port from Render or default 5000
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
