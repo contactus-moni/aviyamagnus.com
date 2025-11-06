@@ -96,5 +96,65 @@ app.get("/users", async (req, res) => {
   }
 });
 
+// -------------------- Enroll a Student --------------------
+app.post("/api/enrollments", async (req, res) => {
+  const { full_name, email, mobile, address, course_id, payment_method } = req.body;
+
+  if (!full_name || !email || !course_id || !payment_method) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  try {
+    // 1️⃣ Check if student already exists
+    let student = await pool.query("SELECT * FROM students WHERE email = $1", [email]);
+
+    let student_id;
+    if (student.rows.length === 0) {
+      // Insert new student
+      const newStudent = await pool.query(
+        `INSERT INTO students (full_name, email, mobile, address)
+         VALUES ($1, $2, $3, $4) RETURNING id`,
+        [full_name, email, mobile, address]
+      );
+      student_id = newStudent.rows[0].id;
+    } else {
+      student_id = student.rows[0].id;
+    }
+
+    // 2️⃣ Fetch course fee
+    const course = await pool.query("SELECT fee FROM courses WHERE id = $1", [course_id]);
+    const registration_fee = course.rows[0]?.fee || 0;
+
+    // 3️⃣ Insert enrollment
+    const enrollment = await pool.query(
+      `INSERT INTO enrollments (student_id, course_id, payment_method, registration_fee)
+       VALUES ($1, $2, $3, $4) RETURNING *`,
+      [student_id, course_id, payment_method, registration_fee]
+    );
+
+    res.json({ message: "Enrollment successful", enrollment: enrollment.rows[0] });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// -------------------- Get all enrollments (optional) --------------------
+app.get("/api/enrollments", async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT e.id, s.full_name, s.email, c.title AS course, e.payment_method, e.registration_fee, e.status
+       FROM enrollments e
+       JOIN students s ON e.student_id = s.id
+       JOIN courses c ON e.course_id = c.id
+       ORDER BY e.created_at DESC`
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
