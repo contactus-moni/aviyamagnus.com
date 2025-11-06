@@ -96,16 +96,17 @@ app.get("/users", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-// ================== GET STUDENT DETAILS ==================
+// --- ✅ GET STUDENT DETAILS ---
 app.get("/student", async (req, res) => {
   const { email } = req.query;
 
   try {
-    if (!email) return res.status(400).json({ error: "Email required" });
+    if (!email) {
+      return res.status(400).json({ error: "Email required" });
+    }
 
-    const result = await pool.query("SELECT * FROM students WHERE email = $1", [email]);
+    // Using your main table aviyamagnus1 instead of students
+    const result = await pool.query("SELECT * FROM aviyamagnus1 WHERE email = $1", [email]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Student not found" });
@@ -118,3 +119,5 @@ app.get("/student", async (req, res) => {
   }
 });
 
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
