@@ -156,5 +156,33 @@ app.get("/api/enrollments", async (req, res) => {
   }
 });
 
+// ✅ Fix CORS to allow your frontend domain
+app.use(
+  cors({
+    origin: [
+      "https://contactus.aviyamagnus.com", // your frontend live domain
+      "http://localhost:3000",             // for local testing
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
+
+app.use(express.json());
+
+// Example route
+app.post("/api/enroll", async (req, res) => {
+  try {
+    // your DB logic here
+    res.status(200).json({ message: "User registered successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
