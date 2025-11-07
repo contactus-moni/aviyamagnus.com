@@ -194,6 +194,13 @@ app.get("/", (req, res) => {
   res.send("✅ Aviya Magnus backend running successfully");
 });
 
+const full_name = req.body.full_name || req.body.name;
+const email = req.body.email;
+const mobile = req.body.mobile || req.body.phone;
+const address = req.body.address || "";
+const course_id = req.body.course_id || req.body.course;
+const payment_method = req.body.payment_method || req.body.payment;
+
 // ------------------------------------------------------
 // 🚀 Start Server
 // ------------------------------------------------------
