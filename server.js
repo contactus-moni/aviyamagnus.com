@@ -4,7 +4,7 @@ import { Pool } from "pg";
 
 const app = express();
 
-// ✅ CORS must be placed at the very top — before any routes
+// ✅ CORS setup
 app.use(
   cors({
     origin: [
@@ -18,9 +18,7 @@ app.use(
   })
 );
 
-// Handle preflight requests globally
 app.options("*", cors());
-
 app.use(express.json());
 
 // ✅ Database connection
@@ -115,7 +113,7 @@ app.get("/users", async (req, res) => {
 });
 
 // ------------------------------------------------------
-// 🧩 Enroll a Student (for your course enrollment form)
+// 🧩 Enroll a Student (MAIN ENROLLMENT ROUTE)
 // ------------------------------------------------------
 app.post("/api/enrollments", async (req, res) => {
   const { full_name, email, mobile, address, course_id, payment_method } = req.body;
@@ -158,6 +156,15 @@ app.post("/api/enrollments", async (req, res) => {
     console.error("Enrollment error:", error);
     res.status(500).json({ error: "Server error" });
   }
+});
+
+// ------------------------------------------------------
+// 🧩 Alias route for your frontend: /api/enroll
+// ------------------------------------------------------
+app.post("/api/enroll", async (req, res) => {
+  // Forward same logic as /api/enrollments
+  req.url = "/api/enrollments";
+  app._router.handle(req, res, () => {});
 });
 
 // ------------------------------------------------------
