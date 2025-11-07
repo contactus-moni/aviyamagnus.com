@@ -3,20 +3,38 @@ import cors from "cors";
 import { Pool } from "pg";
 
 const app = express();
-app.use(cors()); // allow all origins, can restrict later
+
+// ✅ CORS must be placed at the very top — before any routes
+app.use(
+  cors({
+    origin: [
+      "https://contactus.aviyamagnus.com", // your live frontend domain
+      "http://localhost:3000",             // for local testing
+      "http://127.0.0.1:5500"              // for local HTML testing
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
+
+// Handle preflight requests globally
+app.options("*", cors());
+
 app.use(express.json());
 
-// ✅ Replace with your Railway database details
+// ✅ Database connection
 const pool = new Pool({
   connectionString: "postgresql://postgres:ZavKvXmHfseabcTxjNGjVLSRCxaXjySB@shuttle.proxy.rlwy.net:25707/railway",
-  ssl: { rejectUnauthorized: false } // bypass SSL certificate check
+  ssl: { rejectUnauthorized: false },
 });
 
-// --- Register endpoint ---
+// ------------------------------------------------------
+// 🧩 Register endpoint
+// ------------------------------------------------------
 app.post("/register", async (req, res) => {
   const { first_name, last_name, email, password, confirm_password, phone_number, captcha, role } = req.body;
 
-  // basic validation
   if (!first_name || !last_name || !email || !password || !confirm_password || !phone_number || !captcha || !role) {
     return res.status(400).json({ error: "All fields are required" });
   }
@@ -40,17 +58,17 @@ app.post("/register", async (req, res) => {
   }
 });
 
-// --- POST /login ---
+// ------------------------------------------------------
+// 🧩 Login endpoint
+// ------------------------------------------------------
 app.post("/login", async (req, res) => {
   const { email, password, role } = req.body;
 
-  // Basic validation
   if (!email || !password || !role) {
     return res.status(400).json({ error: "Email, password, and role are required" });
   }
 
   try {
-    // Check if the user exists with the specified role
     const result = await pool.query(
       "SELECT * FROM aviyamagnus1 WHERE email = $1 AND role = $2",
       [email, role]
@@ -62,12 +80,10 @@ app.post("/login", async (req, res) => {
 
     const user = result.rows[0];
 
-    // Compare passwords (plain text example, use bcrypt for production)
     if (user.password !== password) {
       return res.status(401).json({ error: "Invalid email, password, or role" });
     }
 
-    // User exists and password matches
     res.json({
       status: "success",
       message: "Login successful",
@@ -86,7 +102,9 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// --- Optional: Get all users ---
+// ------------------------------------------------------
+// 🧩 Get all users (optional)
+// ------------------------------------------------------
 app.get("/users", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM aviyamagnus1");
@@ -96,7 +114,9 @@ app.get("/users", async (req, res) => {
   }
 });
 
-// -------------------- Enroll a Student --------------------
+// ------------------------------------------------------
+// 🧩 Enroll a Student (for your course enrollment form)
+// ------------------------------------------------------
 app.post("/api/enrollments", async (req, res) => {
   const { full_name, email, mobile, address, course_id, payment_method } = req.body;
 
@@ -105,84 +125,70 @@ app.post("/api/enrollments", async (req, res) => {
   }
 
   try {
-    // 1️⃣ Check if student already exists
-    let student = await pool.query("SELECT * FROM students WHERE email = $1", [email]);
-
+    // Check if student exists in aviyamagnus1
+    const userResult = await pool.query("SELECT id FROM aviyamagnus1 WHERE email = $1", [email]);
     let student_id;
-    if (student.rows.length === 0) {
-      // Insert new student
+
+    if (userResult.rows.length > 0) {
+      student_id = userResult.rows[0].id;
+    } else {
       const newStudent = await pool.query(
-        `INSERT INTO students (full_name, email, mobile, address)
-         VALUES ($1, $2, $3, $4) RETURNING id`,
-        [full_name, email, mobile, address]
+        `INSERT INTO aviyamagnus1 (first_name, email, phone_number, address, role)
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING id`,
+        [full_name, email, mobile, address, "student"]
       );
       student_id = newStudent.rows[0].id;
-    } else {
-      student_id = student.rows[0].id;
     }
 
-    // 2️⃣ Fetch course fee
-    const course = await pool.query("SELECT fee FROM courses WHERE id = $1", [course_id]);
-    const registration_fee = course.rows[0]?.fee || 0;
+    // Get course fee
+    const courseResult = await pool.query("SELECT fee FROM courses WHERE id = $1", [course_id]);
+    const registration_fee = courseResult.rows[0]?.fee || 0;
 
-    // 3️⃣ Insert enrollment
+    // Insert enrollment record
     const enrollment = await pool.query(
       `INSERT INTO enrollments (student_id, course_id, payment_method, registration_fee)
-       VALUES ($1, $2, $3, $4) RETURNING *`,
+       VALUES ($1, $2, $3, $4)
+       RETURNING *`,
       [student_id, course_id, payment_method, registration_fee]
     );
 
     res.json({ message: "Enrollment successful", enrollment: enrollment.rows[0] });
   } catch (error) {
-    console.error(error);
+    console.error("Enrollment error:", error);
     res.status(500).json({ error: "Server error" });
   }
 });
 
-// -------------------- Get all enrollments (optional) --------------------
+// ------------------------------------------------------
+// 🧩 Fetch all enrollments (optional)
+// ------------------------------------------------------
 app.get("/api/enrollments", async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT e.id, s.full_name, s.email, c.title AS course, e.payment_method, e.registration_fee, e.status
+      `SELECT e.id, a.first_name AS student_name, a.email, c.title AS course, 
+              e.payment_method, e.registration_fee, e.status
        FROM enrollments e
-       JOIN students s ON e.student_id = s.id
+       JOIN aviyamagnus1 a ON e.student_id = a.id
        JOIN courses c ON e.course_id = c.id
        ORDER BY e.created_at DESC`
     );
     res.json(result.rows);
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching enrollments:", error);
     res.status(500).json({ error: "Server error" });
   }
 });
 
-// ✅ Fix CORS to allow your frontend domain
-app.use(
-  cors({
-    origin: [
-      "https://contactus.aviyamagnus.com", // your frontend live domain
-      "http://localhost:3000",             // for local testing
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
-);
-
-app.use(express.json());
-
-// Example route
-app.post("/api/enroll", async (req, res) => {
-  try {
-    // your DB logic here
-    res.status(200).json({ message: "User registered successfully" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error" });
-  }
+// ------------------------------------------------------
+// ✅ Test API route
+// ------------------------------------------------------
+app.get("/", (req, res) => {
+  res.send("✅ Aviya Magnus backend running successfully");
 });
 
-// Start server
+// ------------------------------------------------------
+// 🚀 Start Server
+// ------------------------------------------------------
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
