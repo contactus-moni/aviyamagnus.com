@@ -8,9 +8,9 @@ const app = express();
 app.use(
   cors({
     origin: [
-      "https://contactus.aviyamagnus.com", // your live frontend domain
-      "http://localhost:3000",             // for local testing
-      "http://127.0.0.1:5500"              // for local HTML testing
+      "https://contactus.aviyamagnus.com", // live frontend
+      "http://localhost:3000",             // React local test
+      "http://127.0.0.1:5500"              // plain HTML test
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -113,9 +113,9 @@ app.get("/users", async (req, res) => {
 });
 
 // ------------------------------------------------------
-// 🧩 Enroll a Student (MAIN ENROLLMENT ROUTE)
+// 🧩 Enroll a Student
 // ------------------------------------------------------
-app.post("/api/enrollments", async (req, res) => {
+app.post("/api/enroll", async (req, res) => {
   const { full_name, email, mobile, address, course_id, payment_method } = req.body;
 
   if (!full_name || !email || !course_id || !payment_method) {
@@ -123,7 +123,7 @@ app.post("/api/enrollments", async (req, res) => {
   }
 
   try {
-    // Check if student exists in aviyamagnus1
+    // Check if student exists
     const userResult = await pool.query("SELECT id FROM aviyamagnus1 WHERE email = $1", [email]);
     let student_id;
 
@@ -154,17 +154,8 @@ app.post("/api/enrollments", async (req, res) => {
     res.json({ message: "Enrollment successful", enrollment: enrollment.rows[0] });
   } catch (error) {
     console.error("Enrollment error:", error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: "Server error", details: error.message });
   }
-});
-
-// ------------------------------------------------------
-// 🧩 Alias route for your frontend: /api/enroll
-// ------------------------------------------------------
-app.post("/api/enroll", async (req, res) => {
-  // Forward same logic as /api/enrollments
-  req.url = "/api/enrollments";
-  app._router.handle(req, res, () => {});
 });
 
 // ------------------------------------------------------
@@ -183,23 +174,16 @@ app.get("/api/enrollments", async (req, res) => {
     res.json(result.rows);
   } catch (error) {
     console.error("Error fetching enrollments:", error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: "Server error", details: error.message });
   }
 });
 
 // ------------------------------------------------------
-// ✅ Test API route
+// ✅ Root route
 // ------------------------------------------------------
 app.get("/", (req, res) => {
   res.send("✅ Aviya Magnus backend running successfully");
 });
-
-const full_name = req.body.full_name || req.body.name;
-const email = req.body.email;
-const mobile = req.body.mobile || req.body.phone;
-const address = req.body.address || "";
-const course_id = req.body.course_id || req.body.course;
-const payment_method = req.body.payment_method || req.body.payment;
 
 // ------------------------------------------------------
 // 🚀 Start Server
