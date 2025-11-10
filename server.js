@@ -113,18 +113,37 @@ app.get("/users", async (req, res) => {
 });
 
 // ------------------------------------------------------
-// 🧩 Enroll a Student
-// ------------------------------------------------------
 app.post("/enroll", async (req, res) => {
-  const { full_name, email, mobile, address, course_id, payment_method, fee } = req.body;
-
-  if (!full_name || !email || !course_id || !payment_method || !fee) {
-    return res.status(400).json({ error: "Missing required fields" });
-  }
-
   try {
+    const {
+      full_name,
+      name,
+      email,
+      mobile,
+      phone,
+      address,
+      course_id,
+      course,
+      payment_method,
+      payment
+    } = req.body;
+
+    // Normalize all possible field variations
+    const finalFullName = full_name || name;
+    const finalEmail = email;
+    const finalMobile = mobile || phone;
+    const finalAddress = address || "";
+    const finalCourseId = course_id || course;
+    const finalPaymentMethod = payment_method || payment;
+
+    // Validate
+    if (!finalFullName || !finalEmail || !finalCourseId || !finalPaymentMethod) {
+      console.log("❌ Missing fields:", { finalFullName, finalEmail, finalCourseId, finalPaymentMethod });
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
     // Check if student exists
-    const userResult = await pool.query("SELECT id FROM aviyamagnus1 WHERE email = $1", [email]);
+    const userResult = await pool.query("SELECT id FROM aviyamagnus1 WHERE email = $1", [finalEmail]);
     let student_id;
 
     if (userResult.rows.length > 0) {
@@ -134,57 +153,26 @@ app.post("/enroll", async (req, res) => {
         `INSERT INTO aviyamagnus1 (first_name, email, phone_number, address, role)
          VALUES ($1, $2, $3, $4, $5)
          RETURNING id`,
-        [full_name, email, mobile, address, "student"]
+        [finalFullName, finalEmail, finalMobile, finalAddress, "student"]
       );
       student_id = newStudent.rows[0].id;
     }
 
-    // Get course fee
-    const courseResult = await pool.query("SELECT fee FROM courses WHERE id = $1", [course_id]);
-    const registration_fee = courseResult.rows[0]?.fee || 0;
-
-    // Insert enrollment record
+    // Insert into enrollments (without fee)
     const enrollment = await pool.query(
-      `INSERT INTO enrollments (student_id, course_id, payment_method, registration_fee)
-       VALUES ($1, $2, $3, $4)
+      `INSERT INTO enrollments (student_id, course_id, payment_method)
+       VALUES ($1, $2, $3)
        RETURNING *`,
-      [student_id, course_id, payment_method, registration_fee]
+      [student_id, finalCourseId, finalPaymentMethod]
     );
 
-    res.json({ message: "Enrollment successful", enrollment: enrollment.rows[0] });
+    res.json({ message: "Enrollment successful ✅", enrollment: enrollment.rows[0] });
+
   } catch (error) {
     console.error("Enrollment error:", error);
     res.status(500).json({ error: "Server error", details: error.message });
   }
 });
-
-// ------------------------------------------------------
-// 🧩 Fetch all enrollments (optional)
-// ------------------------------------------------------
-app.get("/api/enrollments", async (req, res) => {
-  try {
-    const result = await pool.query(
-      `SELECT e.id, a.first_name AS student_name, a.email, c.title AS course, 
-              e.payment_method, e.registration_fee, e.status
-       FROM enrollments e
-       JOIN aviyamagnus1 a ON e.student_id = a.id
-       JOIN courses c ON e.course_id = c.id
-       ORDER BY e.created_at DESC`
-    );
-    res.json(result.rows);
-  } catch (error) {
-    console.error("Error fetching enrollments:", error);
-    res.status(500).json({ error: "Server error", details: error.message });
-  }
-});
-
-// ------------------------------------------------------
-// ✅ Root route
-// ------------------------------------------------------
-app.get("/", (req, res) => {
-  res.send("✅ Aviya Magnus backend running successfully");
-});
-
 // ------------------------------------------------------
 // 🚀 Start Server
 // ------------------------------------------------------
