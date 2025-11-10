@@ -116,9 +116,9 @@ app.get("/users", async (req, res) => {
 // 🧩 Enroll a Student
 // ------------------------------------------------------
 app.post("/enroll", async (req, res) => {
-  const { full_name, email, mobile, address, course_id, payment_method } = req.body;
+  const { full_name, email, mobile, address, course_id, payment_method, fee } = req.body;
 
-  if (!full_name || !email || !course_id || !payment_method) {
+  if (!full_name || !email || !course_id || !payment_method || !fee) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
