@@ -101,7 +101,7 @@ app.post("/login", async (req, res) => {
 });
 
 // ------------------------------------------------------
-// 🧩 Get all users (optional)
+// 🧩 Get all users
 // ------------------------------------------------------
 app.get("/users", async (req, res) => {
   try {
@@ -112,6 +112,8 @@ app.get("/users", async (req, res) => {
   }
 });
 
+// ------------------------------------------------------
+// 🧩 Enrollment endpoint (fixed & clean)
 // ------------------------------------------------------
 app.post("/enroll", async (req, res) => {
   try {
@@ -128,7 +130,7 @@ app.post("/enroll", async (req, res) => {
       payment
     } = req.body;
 
-    // Normalize all possible field variations
+    // Normalize fields
     const finalFullName = full_name || name;
     const finalEmail = email;
     const finalMobile = mobile || phone;
@@ -136,13 +138,13 @@ app.post("/enroll", async (req, res) => {
     const finalCourseId = course_id || course;
     const finalPaymentMethod = payment_method || payment;
 
-    // Validate
+    // Validation
     if (!finalFullName || !finalEmail || !finalCourseId || !finalPaymentMethod) {
       console.log("❌ Missing fields:", { finalFullName, finalEmail, finalCourseId, finalPaymentMethod });
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    // Check if student exists
+    // Check existing student
     const userResult = await pool.query("SELECT id FROM aviyamagnus1 WHERE email = $1", [finalEmail]);
     let student_id;
 
@@ -158,7 +160,7 @@ app.post("/enroll", async (req, res) => {
       student_id = newStudent.rows[0].id;
     }
 
-    // Insert into enrollments (without fee)
+    // Insert enrollment
     const enrollment = await pool.query(
       `INSERT INTO enrollments (student_id, course_id, payment_method)
        VALUES ($1, $2, $3)
@@ -173,6 +175,7 @@ app.post("/enroll", async (req, res) => {
     res.status(500).json({ error: "Server error", details: error.message });
   }
 });
+
 // ------------------------------------------------------
 // 🚀 Start Server
 // ------------------------------------------------------
